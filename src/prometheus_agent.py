@@ -23,7 +23,6 @@ gauges = []
 
 def measure(init_flag):
     exec_result = execute()
-    print(exec_result)
     global gauges
     count = 0
     for data in exec_result:

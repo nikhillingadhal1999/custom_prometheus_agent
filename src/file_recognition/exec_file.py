@@ -106,16 +106,28 @@ def read_function_file():
 
 def get_env_dir():
     current_path = os.getcwd()
-    return os.path.abspath(os.path.join(current_path,'..','..','env/bin/activate'))
+    return os.path.abspath(os.path.join(current_path,'env/bin/activate'))
 
 def install_requirements(requirements_path):
     env_dir = get_env_dir()
     command = f"source {env_dir}; pip3 install -r {requirements_path}"
     os.system(command)
+
+def load_variable_from_file(file_path, variable_name="ARGS"):
+    spec = importlib.util.spec_from_file_location("module_name", file_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return getattr(module, variable_name, None)
+
 def execute():
     folder_path = os.environ.get('CUSTOM_PATH')
     requirements_path = folder_path + '/requirements.txt'
-    install_requirements(requirements_path)
+    print("installing requirements")
+    req_var = os.environ.get("REQ_VAR")
+    if req_var != "True":
+        install_requirements(requirements_path)
+        os.environ["REQ_VAR"] = "True"
+    print("requirements installed.")
     functions = read_function_file()
     args= { 'collect_disk_metrics' : ()}
     result = [ main(folder_path, function_name.strip('\n'), args) for function_name in functions ]
