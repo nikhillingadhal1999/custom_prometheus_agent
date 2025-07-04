@@ -1,3 +1,6 @@
 prometheus_client
 psutil
 pyyaml
+setuptools
+wheel
+twine
