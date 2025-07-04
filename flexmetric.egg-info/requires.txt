@@ -1,6 +1,6 @@
 prometheus_client
+PyYAML
 psutil
-pyyaml
 setuptools
 wheel
 twine
