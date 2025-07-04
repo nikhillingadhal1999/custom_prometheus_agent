@@ -1,0 +1,2 @@
+[console_scripts]
+flexmetric = flexmetric.metric_process.prometheus_agent:main

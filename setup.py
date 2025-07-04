@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="flexmetric",
-    version="0.1.0",
+    version="0.1.1",
     author="Nikhil Lingadhal",
     description="A flexible Prometheus exporter for commands, databases, functions, and scripts.",
     long_description=open("README.md").read(),

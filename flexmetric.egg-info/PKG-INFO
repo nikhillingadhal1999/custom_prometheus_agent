@@ -1,3 +1,31 @@
+Metadata-Version: 2.4
+Name: flexmetric
+Version: 0.1.1
+Summary: A flexible Prometheus exporter for commands, databases, functions, and scripts.
+Home-page: https://github.com/nikhillingadhal1999/custom_prometheus_agent
+Author: Nikhil Lingadhal
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: prometheus_client
+Requires-Dist: PyYAML
+Requires-Dist: psutil
+Requires-Dist: setuptools
+Requires-Dist: wheel
+Requires-Dist: twine
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # FlexMetric
 
 FlexMetric is a lightweight, flexible, and extensible Prometheus exporter that allows you to expose system metrics, database query results, script outputs, and Python function outputs as Prometheus-compatible metrics with minimal setup and maximum customization.
