@@ -1,0 +1,4 @@
+databases:
+  - name: userdb
+    db_type: sqlite
+    db_connection: /Users/nikhil/code/custom_prometheus_agent/test.db

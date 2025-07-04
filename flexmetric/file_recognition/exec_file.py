@@ -98,8 +98,7 @@ def main(folder_path: str, function_name: str, attributes: Dict[str,Any]):
         return execute_function(file_path, function_name,attributes)
 
 
-def read_function_file():
-    custom_path = os.environ.get('CUSTOM_PATH')+'/executable_functions.txt'
+def read_function_file(custom_path):    
     with open(custom_path,'r') as file:
         lines = file.readlines()
     return lines
@@ -119,16 +118,8 @@ def load_variable_from_file(file_path, variable_name="ARGS"):
     spec.loader.exec_module(module)
     return getattr(module, variable_name, None)
 
-def execute():
-    folder_path = os.environ.get('CUSTOM_PATH')
-    requirements_path = folder_path + '/requirements.txt'
-    print("installing requirements")
-    req_var = os.environ.get("REQ_VAR")
-    if req_var != "True":
-        install_requirements(requirements_path)
-        os.environ["REQ_VAR"] = "True"
-    print("requirements installed.")
-    functions = read_function_file()
+def execute_functions(folder_path,file_path):
+    functions = read_function_file(file_path)
     args= { 'collect_disk_metrics' : ()}
     result = [ main(folder_path, function_name.strip('\n'), args) for function_name in functions ]
     return result
