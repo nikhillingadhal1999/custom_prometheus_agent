@@ -1,2 +1,6 @@
 env
 custom_folder_1
+commands.yaml
+database.yaml
+queries.yaml
+test.db

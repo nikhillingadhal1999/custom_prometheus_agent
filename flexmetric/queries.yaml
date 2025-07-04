@@ -1,6 +1,0 @@
-commands:
-  - name: user_count
-    database: userdb
-    query: "SELECT COUNT(*) FROM users;"
-    label: table
-    label_value: users
