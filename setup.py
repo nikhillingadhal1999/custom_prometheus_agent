@@ -2,21 +2,22 @@ from setuptools import setup, find_packages
 
 setup(
     name="flexmetric",
-    version="0.1.1",
+    version="0.2.0",
     author="Nikhil Lingadhal",
     description="A flexible Prometheus exporter for commands, databases, functions, and scripts.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/nikhillingadhal1999/custom_prometheus_agent",
     license="MIT",
-    packages=find_packages(),  # Auto-detects submodules in flexmetric/
+    packages=find_packages(),
     install_requires=[
         "prometheus_client",
         "PyYAML",
         "psutil",
         "setuptools",
         "wheel",
-        "twine"
+        "twine",
+        "flask"
     ],
     entry_points={
         "console_scripts": [

@@ -4,3 +4,4 @@ pyyaml
 setuptools
 wheel
 twine
+flask
