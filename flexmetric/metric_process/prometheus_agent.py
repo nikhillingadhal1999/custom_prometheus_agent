@@ -11,7 +11,11 @@ from flexmetric.metric_process.database_processing import process_database_queri
 from flexmetric.metric_process.expiring_queue import metric_queue
 import argparse
 import os
-from flexmetric.metric_process.views import run_flask
+from flexmetric.metric_process.views import (
+    run_flask,
+    add_update_metric_route,
+    secure_flask_run,
+)
 import sched
 import threading
 
@@ -77,16 +81,25 @@ def arguments():
         "--port", type=int, default=8000, help="port on which exportor runs"
     )
     parser.add_argument(
-        "--flask-host",
+        "--host",
         type=str,
         default="0.0.0.0",
         help="The hostname or IP address on which to run the Flask server (default: 0.0.0.0)",
     )
     parser.add_argument(
-        "--flask-port",
-        type=int,
-        default=5000,
-        help="The port number on which to run the Flask server (default: 5000)",
+        "--enable-https",
+        action="store_true",
+        help="Enable HTTPS for Flask API using SSL certificates.",
+    )
+    parser.add_argument(
+        "--ssl-cert",
+        type=str,
+        help="Path to the SSL certificate file (cert.pem) for HTTPS.",
+    )
+    parser.add_argument(
+        "--ssl-key",
+        type=str,
+        help="Path to the SSL private key file (key.pem) for HTTPS.",
     )
 
     return parser.parse_args()
@@ -111,7 +124,9 @@ gauges = {}
 def validate_required_files(mode_name, required_files):
     missing = [desc for desc, path in required_files.items() if path == None]
     if missing:
-        print(f"Missing {', '.join(missing)} for '{mode_name}' mode. Skipping...")
+        logger.error(
+            f"Missing {', '.join(missing)} for '{mode_name}' mode. Skipping..."
+        )
         return False
 
     return True
@@ -147,7 +162,8 @@ def validate_all_modes(args):
                 "functions-file": args.functions_file,
             },
         ),
-        (args.expose_api, "expose-api", {})
+        (args.expose_api, "expose-api", {}),
+        (args.enable_https,"enable-https",{"ssl-cert":args.ssl_cert,"ssl-key" :args.ssl_key})
     ]
 
     for is_enabled, mode_name, files in mode_validations:
@@ -161,7 +177,6 @@ def validate_all_modes(args):
 def measure(args):
     exec_result = []
     queue_items = metric_queue.pop_all()
-    print("QUEUE_ITEMS : ", queue_items)
     if len(queue_items) != 0:
         exec_result.extend(queue_items)
     if args.database:
@@ -186,7 +201,6 @@ def measure(args):
         else:
             gauge = gauges[gauge_name]
         for result in results:
-            print(result, isinstance(result["label"], list))
             if isinstance(result["label"], str):
                 try:
                     gauge.labels(result["label"]).set(
@@ -211,23 +225,24 @@ def start_scheduler(args):
 
 def main():
     args = arguments()
-    print("Validating configuration...")
+    logger.info("Validating configuration...")
     if not validate_all_modes(args):
-        print("No valid modes with proper configuration found. Exiting.")
+        logger.error("No valid modes with proper configuration found. Exiting.")
         exit(1)
 
-    print(f"Starting Prometheus metrics server on port {args.port}...")
-    print("Starting server")
-    start_http_server(args.port)
+    logger.info(f"Starting Prometheus metrics server on port {args.port}...")
+    logger.info("Starting server")
+    # start_http_server(args.port)
+
     scheduler_thread = threading.Thread(
         target=start_scheduler, args=(args,), daemon=True
     )
     scheduler_thread.start()
     if args.expose_api:
-        run_flask(args.flask_host, args.flask_port)
+        add_update_metric_route()
+    if args.enable_https:
+        secure_flask_run(args)
     else:
-        while True:
-            time.sleep(2)
-
+        run_flask(args.host, args.port)
 
 main()
