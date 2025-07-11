@@ -55,23 +55,39 @@ def parse_command_output(raw_output, label_column, value_column, fixed_label_val
 
 def process_single_command(cmd_info):
     command = cmd_info['command']
-    label_name = cmd_info['label']
     timeout = cmd_info.get('timeout_seconds', 30)
-    label_column = cmd_info.get('label_column', -1)
+    labels = cmd_info.get('labels', [])
+    label_columns = cmd_info.get('label_columns', [])
     value_column = cmd_info.get('value_column', 0)
-    fixed_label_value = cmd_info.get('label_value')
+    main_label = cmd_info.get('main_label', 'default_metric')
 
     raw_output = execute_command_with_timeout(command, timeout)
-    if raw_output == '':
+    if not raw_output:
         logger.warning(f"No results for command {command}")
         return None
 
-    result_list = parse_command_output(raw_output, label_column, value_column, fixed_label_value)
-
+    lines = raw_output.strip().split('\n')
+    if not lines:
+        logger.error(f"No valid lines returned from command: {command}")
+        return None
+    result_list = []
+    for line in lines:
+        parts = line.split()
+        try:
+            label_columns_value = []
+            for value in label_columns:
+                label_columns_value.append(parts[value])
+            result_list.append({ "label": label_columns_value, "value": parts[value_column] })
+        except Exception as e:
+            logger.error(f"Error parsing line: '{line}' → {e}")
+            continue
     return {
         'result': result_list,
-        'labels': [label_name]
+        'labels': labels,
+        'main_label': main_label
     }
+
+
 
 def is_command_safe(command):
     blacklist = ['rm', 'reboot', 'shutdown', 'halt', 'poweroff', 'mkfs', 'dd']
