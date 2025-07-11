@@ -190,27 +190,37 @@ def measure(args):
         if cmd_results != None:
             exec_result.extend(cmd_results)
     global gauges
+
     for data in exec_result:
         results = data["result"]
         labels = data["labels"]
-        gauge_name = "_".join(labels).lower() + "_gauge"
-        # print(labels)
+        main_label_value = data.get("main_label", "default_main")
+        gauge_name = main_label_value.lower() + "_gauge"
+
         if gauge_name not in gauges:
             gauge = Gauge(gauge_name, f"{gauge_name} for different metrics", labels)
             gauges[gauge_name] = gauge
         else:
             gauge = gauges[gauge_name]
+
         for result in results:
-            if isinstance(result["label"], str):
-                try:
-                    gauge.labels(result["label"]).set(
-                        convert_to_data_type(result["value"])
-                    )
-                except Exception as ex:
-                    logger.error("Cannot pass string")
-            elif isinstance(result["label"], list):
-                label_dict = dict(zip(labels, result["label"]))
+            label_values = result["label"]
+
+            if not isinstance(label_values, list):
+                # Automatically wrap single label into list for consistency
+                label_values = [label_values]
+
+            if len(label_values) != len(labels):
+                logger.error(f"Label mismatch: expected {len(labels)} values but got {len(label_values)}")
+                continue
+
+            label_dict = dict(zip(labels, label_values))
+            # print(label_dict)
+
+            try:
                 gauge.labels(**label_dict).set(convert_to_data_type(result["value"]))
+            except Exception as ex:
+                logger.error(f"Failed to set gauge for labels {label_dict}: {ex}")
 
 
 def scheduled_measure(args):
@@ -244,5 +254,6 @@ def main():
         secure_flask_run(args)
     else:
         run_flask(args.host, args.port)
-
+# # args = arguments()
+# # measure(args)
 main()

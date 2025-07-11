@@ -2,12 +2,17 @@ from setuptools import setup, find_packages
 
 setup(
     name="flexmetric",
-    version="0.3.0",
+    version="0.5.3",
     author="Nikhil Lingadhal",
-    description="A secure flexible Prometheus exporter for commands, databases, functions, and scripts.",
+    description="A secure flexible Prometheus exporter for commands, databases, functions.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/nikhillingadhal1999/custom_prometheus_agent",
+    url="https://github.com/nikhillingadhal1999/flexmetric",
+    project_urls={
+        "Homepage": "https://github.com/nikhillingadhal1999", 
+        "Source": "https://github.com/nikhillingadhal1999/flexmetric",
+        "Tracker": "https://github.com/nikhillingadhal1999/flexmetric/issues",
+    },
     license="MIT",
     packages=find_packages(),
     install_requires=[
@@ -17,7 +22,9 @@ setup(
         "setuptools",
         "wheel",
         "twine",
-        "flask"
+        "flask",
+        "clickhouse-connect",
+        "psycopg2-binary"
     ],
     entry_points={
         "console_scripts": [
